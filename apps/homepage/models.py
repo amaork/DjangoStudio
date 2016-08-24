@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 from ..core.models import Document, get_sequence_choices
 
 
@@ -110,8 +111,14 @@ class PaymentPlan(models.Model):
     MAX_ITEM = 3
     SEQ_CHOICES = get_sequence_choices(MAX_ITEM)
 
-    name = models.CharField('付费名称', max_length=16)
-    price = models.IntegerField('服务价格')
+    name = models.CharField('名称', max_length=16)
+
+    # 价格控制
+    origin_price = models.IntegerField('原价', blank=True, null=True)
+    current_price = models.IntegerField('现价')
+    discount = models.FloatField('折扣', blank=True, null=True,
+                                 default=1.0, validators=[MinValueValidator(0.1), MaxValueValidator(1.0)])
+
     desc = models.TextField('付费简述', max_length=64, blank=True, null=True)
     detail = models.TextField('详细介绍', max_length=512, blank=True, null=True)
     sequence = models.CharField('顺序', max_length=1, choices=SEQ_CHOICES)
