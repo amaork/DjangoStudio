@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!--Galleries -->
+<div class="container-fluid text-center">
+    <h1>{{ title }}</h1>
+    <br>
+    <div class="row text-center slideanim">
+        {% for picture in pictures %}
+        <div class="col-sm-3">
+            <div class="thumbnail">
+                <img src="{{ picture.picture.url }}">
+            </div>
+        </div>
+        {% endfor %}
+    </div><br>
+</div>
+{% endblock content %}

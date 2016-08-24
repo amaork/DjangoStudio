@@ -8,7 +8,7 @@ import string
 import os
 
 
-__all__ = ['Document', 'get_sequence_choices']
+__all__ = ['Document', 'Picture', 'Gallery', 'get_sequence_choices']
 
 
 def get_sequence_choices(size):
@@ -73,3 +73,34 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
             os.remove(old.path)
     except Document.DoesNotExist:
         return False
+
+
+class Gallery(models.Model):
+    MAX_ITEM = 99
+
+    name = models.CharField('名称', max_length=32)
+    desc = models.TextField('描述', max_length=128, blank=True, null=True)
+    cover = models.ForeignKey(Document, verbose_name='相册封面', related_name='cover')
+
+    def size(self):
+        """
+        获取相册图像个数
+        :return:
+        """
+        return len(self.get_pictures())
+
+    def get_pictures(self):
+        """
+        获取相册图像列表
+        :return:
+        """
+        return Picture.objects.filter(gallery=self)
+
+    size.short_description = '图像个数'
+
+
+class Picture(models.Model):
+    desc = models.CharField('图片描述', max_length=64, blank=True, null=True)
+    picture = models.ForeignKey(Document, verbose_name='图像文件')
+    gallery = models.ForeignKey(Gallery, verbose_name='相册')
+

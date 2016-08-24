@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 
+
+from ..core.models import Gallery
 from .models import StudioInfo, Custom, Service, PaymentPlan, Message
 from .forms import UserMessageForm
 
@@ -33,9 +35,22 @@ def homepage(request):
     context = {
         'form': form,
         'studio': studio,
+        'galleries': Gallery.objects.all(),
         'customs': Custom.objects.filter(display=True),
         'payments': PaymentPlan.objects.all().order_by('sequence'),
         'services': [Service.get_group_item(x) for x in range(Service.get_group_size())],
     }
     return render(request, 'homepage/index.html', context)
 
+
+def galleries(request, pk):
+    studio = get_object_or_404(StudioInfo)
+    gallery = get_object_or_404(Gallery, pk=pk)
+
+    context = {
+
+        'studio': studio,
+        'title': gallery.name,
+        'pictures': gallery.get_pictures(),
+    }
+    return render(request, 'homepage/gallery.html', context)

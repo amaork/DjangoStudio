@@ -76,4 +76,16 @@ class DocumentAdmin(admin.ModelAdmin):
     list_display = ('name', 'file_path', 'url')
 
 
+class PictureInline(admin.StackedInline):
+    model = Picture
+    extra = 3
+
+
+class GalleryAdmin(LimitInstanceAdmin):
+    limit = Gallery.MAX_ITEM
+    inlines = [PictureInline]
+    list_display = ('name', 'desc', 'size')
+
+
+admin.site.register(Gallery, GalleryAdmin)
 admin.site.register(Document, DocumentAdmin)

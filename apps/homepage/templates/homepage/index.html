@@ -51,35 +51,29 @@
 </div>
 {% endif %}
 
+<!--Galleries -->
+<div id="services" class="container-fluid text-center">
+    <div class="row text-center slideanim">
+        {% for gallery in galleries %}
+        <div class="col-sm-4">
+            <div class="thumbnail">
+                <a href="gallery/{{ gallery.id }}">
+                <img src="{{ gallery.cover.url }}" alt="{{ gallery.name }}">
+                </a>
+                <h2><strong>{{ gallery.name }}</strong></h2>
+            </div>
+        </div>
+        {% endfor %}
+    </div><br>
+</div>
+
+
+
  <!--Container (Portfolio Section)-->
 {% if customs %}
 <div id="portfolio" class="container-fluid text-center bg-grey">
     <h1>客户案例</h1><br>
     <h4>客户的满意是我们至少无上的荣耀</h4>
-    <!--<div class="row text-center slideanim">-->
-        <!--<div class="col-sm-4">-->
-            <!--<div class="thumbnail">-->
-                <!--<img src="paris.jpg" alt="Paris" width="400" height="300">-->
-                <!--<p><strong>Paris</strong></p>-->
-                <!--<p>Yes, we built Paris</p>-->
-            <!--</div>-->
-        <!--</div>-->
-        <!--<div class="col-sm-4">-->
-            <!--<div class="thumbnail">-->
-                <!--<img src="newyork.jpg" alt="New York" width="400" height="300">-->
-                <!--<p><strong>New York</strong></p>-->
-                <!--<p>We built New York</p>-->
-            <!--</div>-->
-        <!--</div>-->
-        <!--<div class="col-sm-4">-->
-            <!--<div class="thumbnail">-->
-                <!--<img src="sanfran.jpg" alt="San Francisco" width="400" height="300">-->
-                <!--<p><strong>San Francisco</strong></p>-->
-                <!--<p>Yes, San Fran is ours</p>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div><br>-->
-
     <h2>客户评价</h2>
     <div id="myCarousel" class="carousel slide text-center" data-ride="carousel">
         <!-- Indicators -->
