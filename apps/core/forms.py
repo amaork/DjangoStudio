@@ -1,6 +1,9 @@
 from django import forms
 
 
+__all__ = ['UserMessageForm']
+
+
 def generate_attr(name):
     return {'placeholder': "{0:s}".format(name), 'class': 'form-control'}
 

@@ -3,12 +3,26 @@ from django.contrib import admin, messages
 from .models import *
 
 
-__all__ = ['OrderedModelAdmin', 'LimitInstanceAdmin']
+__all__ = ['OrderedModelAdmin', 'LimitInstanceAdmin', 'LimitInlineInstanceAdmin']
 
 
 class LimitInstanceAdmin(admin.ModelAdmin):
     """
     继承该类可以限制 Model 创建 Instance 的数量
+    """
+    limit = 1
+
+    def has_add_permission(self, request):
+        num_objects = self.model.objects.count()
+        if num_objects >= self.limit:
+            return False
+        else:
+            return True
+
+
+class LimitInlineInstanceAdmin(admin.StackedInline):
+    """
+    继承该类可以限制 Model 创建 StackedInline Instance 的数量
     """
     limit = 1
 
@@ -76,16 +90,27 @@ class DocumentAdmin(admin.ModelAdmin):
     list_display = ('name', 'file_path', 'url')
 
 
-class PictureInline(admin.StackedInline):
+class PictureInline(LimitInlineInstanceAdmin):
     model = Picture
     extra = 3
+    limit = Gallery.MAX_ITEM
 
 
 class GalleryAdmin(LimitInstanceAdmin):
-    limit = Gallery.MAX_ITEM
     inlines = [PictureInline]
     list_display = ('name', 'desc', 'size')
 
 
+class NavigationAdmin(LimitInstanceAdmin):
+    limit = Navigation.MAX_ITEM
+    list_display = ('text', 'url', 'sequence')
+
+
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'contact', 'comment')
+
+
+admin.site.register(Message, MessageAdmin)
 admin.site.register(Gallery, GalleryAdmin)
 admin.site.register(Document, DocumentAdmin)
+admin.site.register(Navigation, NavigationAdmin)

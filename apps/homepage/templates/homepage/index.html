@@ -28,7 +28,7 @@
 </div>
 
 <!-- Container (Services Section) -->
-{% if services.count %}
+{% if services %}
 <div id="services" class="container-fluid text-center">
     <h1>服务项目</h1>
     <h4>工作室对外提供一下服务</h4>
@@ -38,15 +38,13 @@
         {% for service in group %}
         <div class="col-sm-4">
             <h2>{{ service.name }}</h2>
-            <div class="thumbnail">
+            <div class="thumbnail text-left">
                 <img src="{{ service.icon.url }}" alt="{{ service.name }}">
-                <p><strong>{{ service.desc }}</strong></p>
+                <p><strong>{{ service.desc }}<a class="btn btn-info btn-xs" href="#" role="button">了解更多 &raquo;</a></strong></p>
             </div>
         </div>
         {% endfor %}
     </div>
-    <br>
-    <br>
     {% endfor %}
 </div>
 {% endif %}
@@ -55,14 +53,13 @@
  <!--Container (Portfolio Section)-->
 {% if customs %}
 <div id="portfolio" class="container-fluid text-center bg-grey">
-    <h1>客户案例</h1><br>
+    <h1>客户评价</h1><br>
     <h4>客户的满意是我们至少无上的荣耀</h4>
-    <h2>客户评价</h2>
     <div id="myCarousel" class="carousel slide text-center" data-ride="carousel">
         <!-- Indicators -->
         <ol class="carousel-indicators">
             {% for custom in customs %}
-            {% if custom.id == 1 %}
+            {% if custom.primary %}
             <li data-target="#myCarousel" data-slide-to="{{ custom.id }}" class="active"></li>
             {% else %}
             <li data-target="#myCarousel" data-slide-to="{{ custom.id }}"></li>
@@ -73,7 +70,7 @@
         <!-- Wrapper for slides -->
         <div class="carousel-inner" role="listbox">
             {% for custom in customs %}
-            {% if custom.id == 1 %}
+            {% if custom.primary %}
             <div class="item active">
                 <div align="center">
                     <img class="img-circle" src="{{ custom.avatar.url }}" width="140" height="140">
@@ -114,11 +111,11 @@
 {% if payments %}
 <div id="pricing" class="container-fluid">
     <div class="text-center">
-        <h1>文绣培训</h1>
-        <h4>加入月娟半永久, 投入少回报多, 学一项技能多一项回报</h4>
+        <h1>{{ payments.name }}</h1>
+        <h4>{{ payments.desc }}</h4>
     </div>
     <div class="row slideanim">
-        {% for plan in payments %}
+        {% for plan in payments.plan %}
         <div class="col-sm-4 col-xs-12">
             <div class="panel panel-default text-center">
                 <div class="panel-heading">
@@ -126,13 +123,10 @@
                 </div>
                 <div class="panel-body">
                     <p><strong>{{ plan.desc }}</strong></p>
-                    <!--<p><strong>15</strong> Ipsum</p>-->
-                    <!--<p><strong>5</strong> Dolor</p>-->
-                    <!--<p><strong>2</strong> Sit</p>-->
-                    <!--<p><strong>Endless</strong> Amet</p>-->
                 </div>
                 <div class="panel-footer">
-                    <h3>￥{{ plan.price }}</h3>
+                    <h3><del>￥{{ plan.origin_price }}</del></h3>
+                    <h3>￥{{ plan.current_price }}</h3>
                     <button class="btn btn-lg">立即报名</button>
                 </div>
             </div>
@@ -143,19 +137,20 @@
 {% endif %}
 
 <!-- Container (Contact Section) -->
+{% if contact %}
 <div id="contact" class="container-fluid bg-grey">
     <h1 class="text-center">联系我们</h1>
     <br>
     <div class="row">
         <div class="col-sm-3">
-            <img class="featurette-image img-responsive center-block" height="165" width="165" src="{{ studio.qr_code.url }}" />
+            <img class="featurette-image img-responsive center-block" height="165" width="165" src="{{ contact.qr_code.url }}" />
         </div>
         <div class="col-sm-4">
             <p>我们会在 24 小时之内联系您,让您满意是我们的宗旨</p>
-            <p><span class="glyphicon glyphicon-map-marker"></span> {{ studio.address }}</p>
-            <p><span class="glyphicon glyphicon-phone"></span> {{ studio.phone }}</p>
-            <p><span class="glyphicon glyphicon-envelope"></span> {{ studio.email }}</p>
-            <p><span class="glyphicon glyphicon-qrcode"></span> {{ studio.wechat }}</p>
+            <p><span class="glyphicon glyphicon-map-marker"></span> {{ contact.address }}</p>
+            <p><span class="glyphicon glyphicon-phone"></span> {{ contact.phone }}
+            <p><span class="glyphicon glyphicon-envelope"></span> {{ contact.email }}</p>
+            <p><span class="glyphicon glyphicon-qrcode"></span> {{ contact.wechat }}</p>
         </div>
         <div class="col-sm-5">
             <form action="{{ form.action }}"  method="post">
@@ -198,6 +193,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 <!--<div id="googleMap" style="height:400px;width:100%;"></div>-->
 

@@ -217,17 +217,9 @@ s.parentNode.insertBefore(hm, s);
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="#about">关于</a></li>
-                {% if services.count %}
-                <li><a href="#services">服务项目</a></li>
-                {% endif %}
-                {% if customs %}
-                <li><a href="#portfolio">客户案例</a></li>
-                {% endif %}
-                {% if payments %}
-                <li><a href="#pricing">服务价格</a></li>
-                {% endif %}
-                <li><a href="#contact">联系我们</a></li>
+                {% for nav in navigation.items %}
+                <li><a href="{{ navigation.type }}{{ nav.url }}">{{ nav.text }}</a></li>
+                {% endfor %}
             </ul>
         </div>
     </div>

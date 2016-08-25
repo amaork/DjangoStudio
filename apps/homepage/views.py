@@ -4,9 +4,9 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 
 
-from ..core.models import Gallery
-from .models import StudioInfo, Custom, Service, PaymentPlan, Message
-from .forms import UserMessageForm
+from ..core.models import Gallery, Navigation, Message
+from ..core.forms import UserMessageForm
+from .models import *
 
 
 def homepage(request):
@@ -30,15 +30,14 @@ def homepage(request):
     else:
         form = UserMessageForm()
 
-    studio = get_object_or_404(StudioInfo)
-    primary_payment_plan = studio.payment_plan.get_plans() if isinstance(studio.payment_plan, PaymentPlan) else None
-
     context = {
         'form': form,
-        'studio': studio,
-        'customs': Custom.objects.filter(display=True),
-        'payments': primary_payment_plan,
-        'services': [Service.get_group_item(x) for x in range(Service.get_group_size())],
+        'studio': get_object_or_404(StudioInfo),
+        'contact': get_object_or_404(ContactInfo),
+        'customs': CustomComment.objects.all(),
+        'payments': StudioInfo.get_primary_payment_plan(),
+        'services': Service.get_context_data(),
+        'navigation': Navigation.get_anchor_context(),
     }
     return render(request, 'homepage/index.html', context)
 
