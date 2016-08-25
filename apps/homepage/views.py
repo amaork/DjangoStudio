@@ -31,13 +31,13 @@ def homepage(request):
         form = UserMessageForm()
 
     studio = get_object_or_404(StudioInfo)
+    primary_payment_plan = studio.payment_plan.get_plans() if isinstance(studio.payment_plan, PaymentPlan) else None
 
     context = {
         'form': form,
         'studio': studio,
-        'galleries': Gallery.objects.all(),
         'customs': Custom.objects.filter(display=True),
-        'payments': PaymentPlan.objects.all().order_by('sequence'),
+        'payments': primary_payment_plan,
         'services': [Service.get_group_item(x) for x in range(Service.get_group_size())],
     }
     return render(request, 'homepage/index.html', context)

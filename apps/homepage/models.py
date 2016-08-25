@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
 from ..core.models import Document, get_sequence_choices
 
 
@@ -19,9 +18,12 @@ class StudioInfo(models.Model):
     # 口号将以中号字体显示在工作室名称下方
     slogan = models.CharField('口号', max_length=64)
 
+    # 主推付费计划
+    payment_plan = models.ForeignKey('PaymentPlan', verbose_name='主推付费计划', blank=True, null=True)
+
     # 关于页面介绍信息
-    about = models.TextField('工作室简介', max_length=256)
-    values = models.TextField('价值理念', max_length=128)
+    about = models.TextField('工作室简介', max_length=512)
+    values = models.TextField('价值理念', max_length=512)
 
     # 工作室联系方式
     phone = models.CharField('电话', max_length=64, default='')
@@ -108,17 +110,44 @@ class Custom(models.Model):
 
 
 class PaymentPlan(models.Model):
+    """
+    付费计划，一个付费计划下可以有多个付费项目
+    """
+    name = models.CharField('付费计划名称', max_length=16)
+    desc = models.CharField('付费计划介绍', max_length=128)
+
+    def __str__(self):
+        return self.name
+
+    def size(self):
+        """
+        获取付费项目个数
+        :return:
+        """
+        return len(self.get_plans())
+
+    def get_plans(self):
+        """
+        获取付费项目
+        :return:
+        """
+        return PaymentItem.objects.filter(plan=self).order_by('sequence')
+
+    size.short_description = '个数'
+
+
+class PaymentItem(models.Model):
+    """
+    付费项目
+    """
     MAX_ITEM = 3
     SEQ_CHOICES = get_sequence_choices(MAX_ITEM)
 
     name = models.CharField('名称', max_length=16)
-
-    # 价格控制
     origin_price = models.IntegerField('原价', blank=True, null=True)
     current_price = models.IntegerField('现价')
-    discount = models.FloatField('折扣', blank=True, null=True,
-                                 default=1.0, validators=[MinValueValidator(0.1), MaxValueValidator(1.0)])
-
-    desc = models.TextField('付费简述', max_length=64, blank=True, null=True)
+    desc = models.TextField('简述', max_length=64, blank=True, null=True)
     detail = models.TextField('详细介绍', max_length=512, blank=True, null=True)
-    sequence = models.CharField('顺序', max_length=1, choices=SEQ_CHOICES)
+    plan = models.ForeignKey(PaymentPlan, verbose_name='付费计划')
+    sequence = models.CharField('显示顺序', max_length=1, choices=SEQ_CHOICES)
+
