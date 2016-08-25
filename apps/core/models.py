@@ -23,6 +23,69 @@ def get_sequence_choices(size):
     return zip(str(string.digits[:size]), range(size))
 
 
+class Navigation(models.Model):
+    """
+    导航栏
+    """
+    MAX_ITEM = 10
+    SEQ_CHOICES = get_sequence_choices(MAX_ITEM)
+
+    text = models.CharField("名称", max_length=16, unique=True)
+    url = models.CharField("链接", max_length=64, unique=True)
+    sequence = models.CharField('顺序', max_length=1, choices=SEQ_CHOICES)
+
+    def __str__(self):
+        return self.text
+
+    @staticmethod
+    def size():
+        return len(Navigation.objects.all())
+
+    @staticmethod
+    def get_anchor_context():
+        context = list()
+        for navigation in Navigation.objects.all().order_by('sequence'):
+            if navigation.url[0] in ('#', '/'):
+                context.append({'url': navigation.url, 'text': navigation.text})
+            else:
+                context.append({'url': '#' + navigation.url, 'text': navigation.text})
+
+        return context
+
+    @staticmethod
+    def get_hyperlink_context():
+        context = list()
+        for navigation in Navigation.objects.all().order_by('sequence'):
+            if navigation.url[0] in ('#', '/'):
+                context.append({'url': navigation.url, 'text': navigation.text})
+            else:
+                context.append({'url': '/' + navigation.url, 'text': navigation.text})
+
+        return context
+
+
+class NavigationModel(models.Model):
+    """
+    继承 NavigationModel 后，定义 url, text 在保存模块的时候将会自动创建 NavigationBar Instance
+    """
+    url = ""
+    text = ""
+
+    @staticmethod
+    def get_top_sequence():
+        return 0
+
+    @staticmethod
+    def get_bottom_sequence():
+        return Navigation.MAX_ITEM - 1
+
+    def save(self, *args, **kwargs):
+        if len(self.text) and len(self.url):
+            if not Navigation.objects.filter(url=self.url, text=self.text):
+                Navigation.objects.create(text=self.text, url=self.url, sequence=str(Navigation.size()))
+        super(NavigationModel, self).save(*args, **kwargs)
+
+
 class Document(models.Model):
     """
     文件 Model 负责上传存储各种类型的文件数据
@@ -95,7 +158,10 @@ class Message(models.Model):
         Message.objects.create(name=name, contact=contact, comment=comment)
 
 
-class Gallery(models.Model):
+class Gallery(NavigationModel):
+    """
+    相册
+    """
     MAX_ITEM = 99
 
     name = models.CharField('名称', max_length=32)
@@ -118,60 +184,15 @@ class Gallery(models.Model):
 
     size.short_description = '图像个数'
 
+    def save(self, *args, **kwargs):
+        self.text = self.name
+        self.url = '/gallery/{0:d}'
+        super(Gallery, self).save(*args, **kwargs)
+        Navigation.objects.filter(url=self.url).update(url='/gallery/{0:d}'.format(self.pk))
+
 
 class Picture(models.Model):
     desc = models.CharField('图片描述', max_length=64, blank=True, null=True)
     picture = models.ForeignKey(Document, verbose_name='图像文件')
     gallery = models.ForeignKey(Gallery, verbose_name='相册')
 
-
-class Navigation(models.Model):
-    """
-    导航栏
-    """
-    MAX_ITEM = 10
-    SEQ_CHOICES = get_sequence_choices(MAX_ITEM)
-
-    text = models.CharField("名称", max_length=16, unique=True)
-    url = models.CharField("链接", max_length=64, unique=True)
-    sequence = models.CharField('顺序', max_length=1, choices=SEQ_CHOICES)
-
-    def __str__(self):
-        return self.text
-
-    @staticmethod
-    def get_anchor_context():
-        context = dict()
-        context['type'] = '#'
-        context['items'] = Navigation.objects.all().order_by('sequence')
-        return context
-
-    @staticmethod
-    def get_hyperlink_context():
-        context = dict()
-        context['type'] = '/'
-        context['items'] = Navigation.objects.all().order_by('sequence')
-        return context
-
-
-class NavigationModel(models.Model):
-    """
-    继承 NavigationModel 后，定义 url, text, sequence 在保存模块的时候将会自动创建 NavigationBar Instance
-    """
-    url = ""
-    text = ""
-    sequence = -1
-
-    @staticmethod
-    def get_top_sequence():
-        return 0
-
-    @staticmethod
-    def get_bottom_sequence():
-        return Navigation.MAX_ITEM - 1
-
-    def save(self, *args, **kwargs):
-        if len(self.text) and len(self.url) and self.sequence != -1:
-            if not Navigation.objects.filter(url=self.url, text=self.text):
-                Navigation.objects.create(text=self.text, url=self.url, sequence=self.sequence)
-        super(NavigationModel, self).save(*args, **kwargs)

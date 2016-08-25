@@ -51,5 +51,6 @@ def galleries(request, pk):
         'studio': studio,
         'title': gallery.name,
         'pictures': gallery.get_pictures(),
+        'navigation': Navigation.get_hyperlink_context(),
     }
     return render(request, 'homepage/gallery.html', context)

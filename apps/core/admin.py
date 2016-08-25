@@ -101,7 +101,7 @@ class GalleryAdmin(LimitInstanceAdmin):
     list_display = ('name', 'desc', 'size')
 
 
-class NavigationAdmin(LimitInstanceAdmin):
+class NavigationAdmin(OrderedModelAdmin):
     limit = Navigation.MAX_ITEM
     list_display = ('text', 'url', 'sequence')
 

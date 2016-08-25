@@ -217,8 +217,8 @@ s.parentNode.insertBefore(hm, s);
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav navbar-right">
-                {% for nav in navigation.items %}
-                <li><a href="{{ navigation.type }}{{ nav.url }}">{{ nav.text }}</a></li>
+                {% for nav in navigation %}
+                <li><a href="{{ nav.url }}">{{ nav.text }}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -248,8 +248,11 @@ $(document).ready(function(){
   // Add smooth scrolling to all links in navbar + footer link
   $(".navbar a, footer a[href='#myStudio']").on('click', function(event) {
 
-    // Prevent default anchor click behavior
-    event.preventDefault();
+    // Prevent default anchor click behavior, just work on hash not work for hyperlink
+    if (this.hash){
+
+        event.preventDefault();
+    }
 
     // Store hash
     var hash = this.hash;

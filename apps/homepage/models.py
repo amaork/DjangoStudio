@@ -11,7 +11,6 @@ class StudioInfo(NavigationModel):
     """
     url = 'about'
     text = '关于'
-    sequence = NavigationModel.get_top_sequence()
 
     # 名称将已超大字体显示在页面顶端
     name = models.CharField('工作室名称', max_length=32)
@@ -56,12 +55,11 @@ class ContactInfo(NavigationModel):
     """
     url = 'contact'
     text = '联系我们'
-    sequence = NavigationModel.get_bottom_sequence()
 
     phone = models.CharField('电话', max_length=64, default='')
     wechat = models.CharField('微信', max_length=16,  default='')
     address = models.CharField('地址', max_length=128, default='')
-    email = models.EmailField('邮箱', max_length=32, default='', blank=True, null=True)
+    email = models.EmailField('邮箱', max_length=32, default='')
     weibo = models.CharField('微薄', max_length=32, default='', blank=True, null=True)
     qr_code = models.ForeignKey(Document, verbose_name='微信二维码', related_name='wechat')
 
@@ -72,7 +70,6 @@ class Service(NavigationModel):
     """
     url = 'services'
     text = '服务项目'
-    sequence = NavigationModel.get_top_sequence() + 1
 
     MAX_ITEM = 9
     GROUP_ITEM = 3
@@ -103,7 +100,10 @@ class Service(NavigationModel):
 
     @staticmethod
     def get_context_data():
-        return [Service.get_group_item(x) for x in range(Service.get_group_size())]
+        if len(Service.objects.all()) == 0:
+            return None
+        else:
+            return [Service.get_group_item(x) for x in range(Service.get_group_size())]
 
     def __str__(self):
         return '{0:s}:{1:s}'.format(self.sequence, self.name)
@@ -115,7 +115,6 @@ class CustomComment(NavigationModel):
     """
     url = 'portfolio'
     text = '客户评价'
-    sequence = NavigationModel.get_top_sequence() + 2
 
     name = models.CharField('昵称', max_length=16)
     work = models.CharField('职业', max_length=16, default='', blank=True, null=True)
@@ -133,7 +132,6 @@ class PaymentPlan(NavigationModel):
     """
     url = 'pricing'
     text = '付费项目'
-    sequence = NavigationModel.get_top_sequence() + 3
 
     MAX_ITEM = 3
     name = models.CharField('付费计划名称', max_length=16)
