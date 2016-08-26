@@ -40,7 +40,7 @@
             <h2>{{ service.name }}</h2>
             <div class="thumbnail text-left">
                 <img src="{{ service.icon.url }}" alt="{{ service.name }}">
-                <p><strong>{{ service.desc }}<a class="btn btn-info btn-xs" href="#" role="button">了解更多 &raquo;</a></strong></p>
+                <p><strong>{{ service.desc }}<a class="btn btn-info btn-xs" href="/service/{{ service.pk }}" role="button">了解更多 &raquo;</a></strong></p>
             </div>
         </div>
         {% endfor %}
@@ -127,7 +127,7 @@
                 <div class="panel-footer">
                     <h3><del>￥{{ plan.origin_price }}</del></h3>
                     <h3>￥{{ plan.current_price }}</h3>
-                    <button class="btn btn-lg">立即报名</button>
+                    <a href="tel:{{ payments.apply_phone }}" class="btn btn-default btn-lg" role="button">立即报名</a>
                 </div>
             </div>
         </div>

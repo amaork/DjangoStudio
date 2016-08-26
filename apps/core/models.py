@@ -4,11 +4,17 @@ from django.db.models.signals import pre_delete, pre_save
 from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 from django.db import models
+
+import markdown2
 import string
 import os
 
 
-__all__ = ['Document', 'Message', 'Picture', 'Gallery', 'Navigation', 'NavigationModel', 'get_sequence_choices']
+__all__ = ['Document',
+           'Message',
+           'MarkdownField',
+           'Picture', 'Gallery',
+           'Navigation', 'NavigationModel', 'get_sequence_choices']
 
 
 def get_sequence_choices(size):
@@ -227,3 +233,18 @@ class Picture(models.Model):
     picture = models.ForeignKey(Document, verbose_name='图像文件')
     gallery = models.ForeignKey(Gallery, verbose_name='相册')
 
+
+class MarkdownField(models.Model):
+    """
+    Markdown 文本
+    """
+    title = models.CharField('标题', max_length=32)
+    markdown = models.TextField('Markdown', max_length=4096)
+    html = models.TextField('HTML', max_length=4096, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.html = markdown2.markdown(self.markdown)
+        super(MarkdownField, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title

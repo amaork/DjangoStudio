@@ -110,6 +110,7 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = ('name', 'contact', 'comment')
 
 
+admin.site.register(MarkdownField)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Gallery, GalleryAdmin)
 admin.site.register(Document, DocumentAdmin)

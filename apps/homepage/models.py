@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.shortcuts import get_object_or_404
 from django.db import models
-from ..core.models import Document, NavigationModel, get_sequence_choices
+from ..core.models import Document, MarkdownField, NavigationModel, get_sequence_choices
 
 _app_name = 'homepage'
 
@@ -36,7 +36,7 @@ class StudioInfo(NavigationModel):
     icon = models.ForeignKey(Document, verbose_name='浏览器 ICO', related_name='ico')
 
     @staticmethod
-    def get_primary_payment_plan():
+    def get_context_data():
         studio = get_object_or_404(StudioInfo)
         if not isinstance(studio, StudioInfo):
             return None
@@ -49,6 +49,7 @@ class StudioInfo(NavigationModel):
         context['name'] = plan.name
         context['desc'] = plan.desc
         context['plan'] = plan.get_plans()
+        context['apply_phone'] = plan.apply_phone
         return context
 
 
@@ -86,8 +87,7 @@ class Service(NavigationModel):
     desc = models.TextField('服务简述', max_length=128)
 
     # 服务的详细信息, 点开之后可以查看
-    # TODO: 考虑使用 Collapse,或链接实现
-    detail = models.TextField('详细介绍', max_length=512, blank=True, null=True)
+    detail = models.ForeignKey(MarkdownField, verbose_name='详细介绍', blank=True, null=True)
 
     # 服务的顺序, 1 - 9 三个一组排列成一排
     sequence = models.CharField('顺序', max_length=1, choices=SEQ_CHOICES)
@@ -111,7 +111,7 @@ class Service(NavigationModel):
             return [Service.get_group_item(x) for x in range(Service.get_group_size())]
 
     def __str__(self):
-        return '{0:s}:{1:s}'.format(self.sequence, self.name)
+        return self.name
 
 
 class CustomComment(NavigationModel):
@@ -143,6 +143,7 @@ class PaymentPlan(NavigationModel):
     MAX_ITEM = 3
     name = models.CharField('付费计划名称', max_length=16)
     desc = models.CharField('付费计划介绍', max_length=128)
+    apply_phone = models.CharField('报名电话', max_length=32)
 
     def __str__(self):
         return self.name

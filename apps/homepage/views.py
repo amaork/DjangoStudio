@@ -35,14 +35,14 @@ def homepage(request):
         'studio': get_object_or_404(StudioInfo),
         'contact': get_object_or_404(ContactInfo),
         'customs': CustomComment.objects.all(),
-        'payments': StudioInfo.get_primary_payment_plan(),
+        'payments': StudioInfo.get_context_data(),
         'services': Service.get_context_data(),
         'navigation': Navigation.get_anchor_context(),
     }
     return render(request, 'homepage/index.html', context)
 
 
-def galleries(request, pk):
+def gallery(request, pk):
     studio = get_object_or_404(StudioInfo)
     gallery = get_object_or_404(Gallery, pk=pk)
 
@@ -54,3 +54,17 @@ def galleries(request, pk):
         'navigation': Navigation.get_hyperlink_context(),
     }
     return render(request, 'homepage/gallery.html', context)
+
+
+def service(request, pk):
+    studio = get_object_or_404(StudioInfo)
+    instance = get_object_or_404(Service, pk=pk)
+
+    context = {
+
+        'studio': studio,
+        'return': '/homepage/anchor/services',
+        'service': instance,
+        'navigation': Navigation.get_hyperlink_context(),
+    }
+    return render(request, 'homepage/service.html', context)
