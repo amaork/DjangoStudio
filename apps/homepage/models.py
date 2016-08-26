@@ -4,6 +4,8 @@ from django.shortcuts import get_object_or_404
 from django.db import models
 from ..core.models import Document, NavigationModel, get_sequence_choices
 
+_app_name = 'homepage'
+
 
 class StudioInfo(NavigationModel):
     """
@@ -11,6 +13,7 @@ class StudioInfo(NavigationModel):
     """
     url = 'about'
     text = '关于'
+    parent = _app_name
 
     # 名称将已超大字体显示在页面顶端
     name = models.CharField('工作室名称', max_length=32)
@@ -55,6 +58,7 @@ class ContactInfo(NavigationModel):
     """
     url = 'contact'
     text = '联系我们'
+    parent = _app_name
 
     phone = models.CharField('电话', max_length=64, default='')
     wechat = models.CharField('微信', max_length=16,  default='')
@@ -70,6 +74,7 @@ class Service(NavigationModel):
     """
     url = 'services'
     text = '服务项目'
+    parent = _app_name
 
     MAX_ITEM = 9
     GROUP_ITEM = 3
@@ -115,6 +120,7 @@ class CustomComment(NavigationModel):
     """
     url = 'portfolio'
     text = '客户评价'
+    parent = _app_name
 
     name = models.CharField('昵称', max_length=16)
     work = models.CharField('职业', max_length=16, default='', blank=True, null=True)
@@ -132,6 +138,7 @@ class PaymentPlan(NavigationModel):
     """
     url = 'pricing'
     text = '付费项目'
+    parent = _app_name
 
     MAX_ITEM = 3
     name = models.CharField('付费计划名称', max_length=16)

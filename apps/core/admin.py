@@ -103,7 +103,7 @@ class GalleryAdmin(LimitInstanceAdmin):
 
 class NavigationAdmin(OrderedModelAdmin):
     limit = Navigation.MAX_ITEM
-    list_display = ('text', 'url', 'sequence')
+    list_display = ('text', 'url', 'sequence', 'is_anchor', 'parent')
 
 
 class MessageAdmin(admin.ModelAdmin):

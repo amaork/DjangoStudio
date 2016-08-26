@@ -34,6 +34,9 @@ class Navigation(models.Model):
     url = models.CharField("链接", max_length=64, unique=True)
     sequence = models.CharField('顺序', max_length=1, choices=SEQ_CHOICES)
 
+    is_anchor = models.BooleanField('是否是锚')
+    parent = models.CharField('锚父页面', max_length=64, blank=True, null=True)
+
     def __str__(self):
         return self.text
 
@@ -45,10 +48,22 @@ class Navigation(models.Model):
     def get_anchor_context():
         context = list()
         for navigation in Navigation.objects.all().order_by('sequence'):
-            if navigation.url[0] in ('#', '/'):
-                context.append({'url': navigation.url, 'text': navigation.text})
+            if navigation.is_anchor:
+                if navigation.parent:
+                    context.append({
+                        'text': navigation.text,
+                        'url': '/{0:s}/#{1:s}'.format(navigation.parent, navigation.url)
+                    })
+                else:
+                    context.append({
+                        'text': navigation.text,
+                        'url': '#{0:s}'.format(navigation.url)
+                    })
             else:
-                context.append({'url': '#' + navigation.url, 'text': navigation.text})
+                context.append({
+                    'text': navigation.text,
+                    'url': '/{0:s}'.format(navigation.url)
+                })
 
         return context
 
@@ -56,10 +71,22 @@ class Navigation(models.Model):
     def get_hyperlink_context():
         context = list()
         for navigation in Navigation.objects.all().order_by('sequence'):
-            if navigation.url[0] in ('#', '/'):
-                context.append({'url': navigation.url, 'text': navigation.text})
+            if navigation.is_anchor:
+                if navigation.parent:
+                    context.append({
+                        'text': navigation.text,
+                        'url': '/{0:s}/anchor/{1:s}'.format(navigation.parent, navigation.url)
+                    })
+                else:
+                    context.append({
+                        'text': navigation.text,
+                        'url': '/{0:s}'.format(navigation.url)
+                    })
             else:
-                context.append({'url': '/' + navigation.url, 'text': navigation.text})
+                context.append({
+                    'text': navigation.text,
+                    'url': '/{0:s}'.format(navigation.url)
+                })
 
         return context
 
@@ -70,6 +97,8 @@ class NavigationModel(models.Model):
     """
     url = ""
     text = ""
+    parent = ""
+    is_anchor = True
 
     @staticmethod
     def get_top_sequence():
@@ -82,7 +111,8 @@ class NavigationModel(models.Model):
     def save(self, *args, **kwargs):
         if len(self.text) and len(self.url):
             if not Navigation.objects.filter(url=self.url, text=self.text):
-                Navigation.objects.create(text=self.text, url=self.url, sequence=str(Navigation.size()))
+                Navigation.objects.create(text=self.text, url=self.url, sequence=str(Navigation.size()),
+                                          is_anchor=self.is_anchor, parent=self.parent)
         super(NavigationModel, self).save(*args, **kwargs)
 
 
@@ -186,9 +216,10 @@ class Gallery(NavigationModel):
 
     def save(self, *args, **kwargs):
         self.text = self.name
-        self.url = '/gallery/{0:d}'
+        self.url = 'gallery/{0:d}'
+        self.is_anchor = False
         super(Gallery, self).save(*args, **kwargs)
-        Navigation.objects.filter(url=self.url).update(url='/gallery/{0:d}'.format(self.pk))
+        Navigation.objects.filter(url=self.url).update(url=self.url.format(self.pk))
 
 
 class Picture(models.Model):
