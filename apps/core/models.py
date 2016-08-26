@@ -200,9 +200,10 @@ class Gallery(NavigationModel):
     """
     MAX_ITEM = 99
 
-    name = models.CharField('名称', max_length=32)
+    name = models.CharField('名称', max_length=32, unique=True)
     desc = models.TextField('描述', max_length=128, blank=True, null=True)
-    cover = models.ForeignKey(Document, verbose_name='相册封面', related_name='cover')
+    cover = models.ForeignKey(Document, verbose_name='封面', related_name='cover')
+    enable_navigation = models.BooleanField('导航栏显示', default=False,)
 
     def size(self):
         """
@@ -223,14 +224,20 @@ class Gallery(NavigationModel):
     def save(self, *args, **kwargs):
         self.text = self.name
 
-        if not Navigation.objects.filter(text=self.text).exists():
-            self.url = 'gallery/{0:d}'
-            self.is_anchor = False
-            # 必须先保存才能获取 pk
-            super(Gallery, self).save(*args, **kwargs)
-            # 更新相册 url 为真实的 url
-            Navigation.objects.filter(url=self.url).update(url=self.url.format(self.pk))
+        # 在导航栏显示
+        if self.enable_navigation:
+            if not Navigation.objects.filter(text=self.text).exists():
+                self.url = 'gallery/{0:d}'
+                self.is_anchor = False
+                # 必须先保存才能获取 pk
+                super(Gallery, self).save(*args, **kwargs)
+                # 更新相册 url 为真实的 url
+                Navigation.objects.filter(url=self.url).update(url=self.url.format(self.pk))
+            else:
+                super(Gallery, self).save(*args, **kwargs)
+        # 关闭导航栏显示
         else:
+            Navigation.objects.filter(text=self.text).delete()
             super(Gallery, self).save(*args, **kwargs)
 
 

@@ -48,6 +48,7 @@ class OrderedModelAdmin(LimitInstanceAdmin):
         else:
             item1 = queryset.all()[0]
             item2 = queryset.all()[1]
+            item1.sequence, item2.sequence = item2.sequence, item1.sequence
             item1.save()
             item2.save()
             self.message_user(request, "Select items sequence has swap")
@@ -96,9 +97,10 @@ class PictureInline(LimitInlineInstanceAdmin):
     limit = Gallery.MAX_ITEM
 
 
-class GalleryAdmin(LimitInstanceAdmin):
+class GalleryAdmin(admin.ModelAdmin):
     inlines = [PictureInline]
-    list_display = ('name', 'desc', 'size')
+    fields = (('name', 'enable_navigation'), 'cover', 'desc')
+    list_display = ('name', 'desc', 'size', 'enable_navigation')
 
 
 class NavigationAdmin(OrderedModelAdmin):

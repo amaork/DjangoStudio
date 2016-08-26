@@ -84,7 +84,7 @@ class Service(NavigationModel):
     name = models.CharField('服务名称', max_length=16, unique=True)
 
     # 服务简述,放在名称图像下方
-    desc = models.TextField('服务简述', max_length=128)
+    desc = models.TextField('服务简述', max_length=512)
 
     # 服务的详细信息, 点开之后可以查看
     detail = models.ForeignKey(MarkdownField, verbose_name='详细介绍', blank=True, null=True)
@@ -142,7 +142,7 @@ class PaymentPlan(NavigationModel):
 
     MAX_ITEM = 3
     name = models.CharField('付费计划名称', max_length=16)
-    desc = models.CharField('付费计划介绍', max_length=128)
+    desc = models.CharField('付费计划介绍', max_length=512)
     apply_phone = models.CharField('报名电话', max_length=32)
 
     def __str__(self):
@@ -179,7 +179,7 @@ class PaymentItem(models.Model):
     name = models.CharField('名称', max_length=16)
     origin_price = models.IntegerField('原价', blank=True, null=True)
     current_price = models.IntegerField('现价')
-    desc = models.TextField('简述', max_length=64, blank=True, null=True)
+    desc = models.TextField('简述', max_length=512, blank=True, null=True)
     detail = models.TextField('详细介绍', max_length=512, blank=True, null=True)
     plan = models.ForeignKey(PaymentPlan, verbose_name='付费计划')
     sequence = models.CharField('显示顺序', max_length=1, choices=SEQ_CHOICES)
