@@ -222,10 +222,16 @@ class Gallery(NavigationModel):
 
     def save(self, *args, **kwargs):
         self.text = self.name
-        self.url = 'gallery/{0:d}'
-        self.is_anchor = False
-        super(Gallery, self).save(*args, **kwargs)
-        Navigation.objects.filter(url=self.url).update(url=self.url.format(self.pk))
+
+        if not Navigation.objects.filter(text=self.text).exists():
+            self.url = 'gallery/{0:d}'
+            self.is_anchor = False
+            # 必须先保存才能获取 pk
+            super(Gallery, self).save(*args, **kwargs)
+            # 更新相册 url 为真实的 url
+            Navigation.objects.filter(url=self.url).update(url=self.url.format(self.pk))
+        else:
+            super(Gallery, self).save(*args, **kwargs)
 
 
 class Picture(models.Model):
